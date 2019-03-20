@@ -19,6 +19,8 @@ int serialResponder(int responce)
 			Serial.write('\n');
 			break;
 		}
+
+   
 		case GOTOSWERR:
 		{
 			Serial.write("<btgoto [ERR]>");//Error condtion from btgoto
@@ -61,7 +63,22 @@ int serialResponder(int responce)
       Serial.write('\n');
       break;
     }
-
+    case LOADTHERE:
+    {
+      Serial.write("<btload [ACK]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      break;
+    }    
+    case CENTRETHERE:
+    {
+      Serial.write("<btcentre [ACK]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      break;
+    }
     case NEXTACK:
     {
       Serial.write("<btnext [ACK]>");//next in sequence recived
@@ -107,7 +124,7 @@ int serialResponder(int responce)
 //			}
 //     else
 //     {
-      Serial.write("<btmovecomplete {RSP]>");
+      Serial.write("<btmovecomplete [RSP]>");
 //      }
       goFlag = false;
 			Serial.write('\n');
@@ -115,7 +132,7 @@ int serialResponder(int responce)
 		}
 		case LOADACK:
 		{
-			Serial.write("<btload [ACK]>");//Acknologment for load sequence
+			Serial.write("<btload of [ACK]>");//Acknologment for load sequence
 			Serial.write('\n');
 			break;
 		}
@@ -147,6 +164,8 @@ int serialResponder(int responce)
 		{
 			Serial.write("<btwtsn [ACK]>");
 			Serial.write('\n');
+      Serial.write("<btwtsn [RSP]>");
+      Serial.write('\n');
 			break;
 		}
 		case HELP:
@@ -156,42 +175,56 @@ int serialResponder(int responce)
 		}
 		case GOTOBSY://Stepper motors busy cannot move yet
 		{
+			Serial.write("<btgoto [ACK]>");
+      Serial.write('\n');
 			Serial.write("<btgoto [BSY]>");
 			Serial.write('\n');
 			break;
 		}
     case SEQBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btsequence [ACK]>");
+      Serial.write('\n');
       Serial.write("<btsequence [BSY]>");
       Serial.write('\n');
       break;
     }
     case NEXTBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btnext [ACK]>");
+      Serial.write('\n');
       Serial.write("<btnext [BSY]>");
       Serial.write('\n');
       break;
     }
      case PREVBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btprev [ACK]>");
+      Serial.write('\n');
       Serial.write("<btprev [BSY]>");
       Serial.write('\n');
       break;
     }
     case CENTREBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btcentre [ACK]>");
+      Serial.write('\n');
       Serial.write("<btcentre [BSY]>");
       Serial.write('\n');
       break;
     }
     case LOADBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btload [ACK]>");
+      Serial.write('\n');
       Serial.write("<btload [BSY]>");
       Serial.write('\n');
       break;
     }
     case GOPOSBSY://Stepper motors busy cannot move yet
     {
+      Serial.write("<btgopos [ACK]>");
+      Serial.write('\n');
       Serial.write("<btgopos [BSY]>");
       Serial.write('\n');
       break;
@@ -210,7 +243,6 @@ int serialResponder(int responce)
 			printInfo();
 			break;
 		}
-
 		case COMMANDERROR://Error in command
 		{
 			Serial.write("<btcomd [ERR}>");
@@ -234,20 +266,14 @@ int serialResponder(int responce)
    case POSACK://request for position  in formt <btpos lin:000 ang:000>
    {
       Serial.write("<btpos [ACK]>");
-      Serial.println(newPosition);
       Serial.write('\n');   
-//      Serial.write("<btpos ");
-//      Serial.print(TMC2130_LS.currentPos);
-//      Serial.write(" ang:");
-//      Serial.print(TMC2130_TT.currentPos);
-//      Serial.write(">");
-//      Serial.write('\n');
+;
       Serial.write("<btpos ");
-      if(returnedData.posnumber <10)//Shows <001/039> where 001 is the point in the sequence completed and 039 being the total number of sequences ie 0-39 (40 steps)
+      if(newPosition <10)//Shows <001/039> where 001 is the point in the sequence completed and 039 being the total number of sequences ie 0-39 (40 steps)
         Serial.write("00");
       else
          Serial.write("0");
-      Serial.print(returnedData.posnumber);
+      Serial.print(newPosition);
       Serial.write(" [RSP]>");
 //      if(returnedData.numberpos <10)
 //        Serial.write("00");
@@ -290,6 +316,7 @@ void helpPrint()
 void printInfo()
 {  //Done
   Serial.print(F("<btinfo [ACK]"));
+  Serial.write('\n');
 	Serial.print(F("<bt info "));
 	Serial.print(F("hw:xxxx "));
 	Serial.print(F("fw:0.0.1 "));

@@ -90,9 +90,9 @@ void loop()
         responceToSend = COMMANDERROR;
       else
         {
-          newPosition++;
           TMC2130_LS.moveAbsolute(findPosLS());
-          TMC2130_TT.moveAbsolute(findPosTT());          
+          TMC2130_TT.moveAbsolute(findPosTT());
+          newPosition++;         
           responceToSend = NEXTACK;
         }
       
@@ -117,9 +117,11 @@ void loop()
         responceToSend = COMMANDERROR;
       else
         {
+        newPosition--;
         newPosition--;  
         TMC2130_LS.moveAbsolute(findPosLS());
         TMC2130_TT.moveAbsolute(findPosTT());
+        newPosition++;
         responceToSend = PREVACK;
         }
     
@@ -159,8 +161,18 @@ void loop()
 		{
 			TMC2130_LS.load();//Sets position to move to home to
 			TMC2130_TT.load();
+      newPosition = 0;
+//      Serial.println("Got in here load");
 			responceToSend = LOADACK;
 		}
+    else if(returnedData.responce == LOADTHERE)
+    {
+      responceToSend = LOADTHERE;
+    }
+    else if(returnedData.responce == CENTRETHERE)
+    {
+      responceToSend = CENTRETHERE;
+    }
     else if((returnedData.responce == CENTREACK))
     {
       TMC2130_LS.centre();//Sets position to move to home to
@@ -203,6 +215,10 @@ void loop()
     else if(returnedData.responce == SEQNUM)
     {
       responceToSend = SEQNUMACK;
+    }
+    else if(returnedData.responce == SEQTHERE)
+    {
+      responceToSend = SEQTHERE;  
     }
 		else
 		{
@@ -289,13 +305,15 @@ byte vibEngine(byte vibMag)
 int findPosLS()
 	{
 		int required_pos = sampleArray[newPosition][0];
-    Serial.println(required_pos);
+    returnedData.lin = required_pos;
+//    Serial.println(required_pos);
 		return required_pos;
 	}
 		
 int findPosTT()
 	{
 		int required_pos = sampleArray[newPosition][1];
-    Serial.println(required_pos);
+    returnedData.ang = required_pos;
+//    Serial.println(required_pos);
 		return required_pos;
 	}

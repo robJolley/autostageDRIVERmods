@@ -51,7 +51,7 @@
 	#define SEQUENCECOMPLETE 19
 	#define MOVECOMPLETE 20
 	#define GOPOSACK 21
-	#define NOPROGRAM 40
+	#define NOPROGRAM 80
 	#define CENTRECOMPLETE 22
   #define NEXTACK 23
   #define PREVACK 24
@@ -69,6 +69,8 @@
   #define SEQTHERE 36
   #define LOADBSY 37
   #define SAMPLEARRAY 27
+  #define LOADTHERE 38
+  #define CENTRETHERE 39
   
 	bool dir = true;
   bool goFlag = false;//To distingush from sequence and btgoto...
@@ -103,7 +105,7 @@
     {10,216},{10,240},{10,264},{10,288},{10,312},{10,336},{10,0},
     {10,24},{10,48},{10,72},{10,96},{10,120},{10,144},
     {10,168},{10,192}};
-    
+      
 	int sampleStep = 0;
 	
 	

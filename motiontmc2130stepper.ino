@@ -179,7 +179,7 @@ long linearTMC2130Stepper::moveAbsolute(long moveLL)
 
 byte linearTMC2130Stepper::load()
 {			
-	moveAbsolute(-50);
+	moveAbsolute(-60);
 	return 0;
 }
 byte linearTMC2130Stepper::centre()
