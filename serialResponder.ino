@@ -39,7 +39,8 @@ int serialResponder(int responce)
         Serial.write("<btredy [BSY]>");//Device not after setup
         Serial.write('\n');
      }
-        Serial.write("<btredy [RSP]>");  
+        Serial.write("<btredy [RSP]>");
+        Serial.write('\n');         
 			break;
 		}
 		case READYSWERR:
