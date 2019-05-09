@@ -7,15 +7,15 @@ int serialResponder(int responce)
 	{
 		case HB:
 		{  //Done
-			Serial.write("<HB>");
+			Serial.print(F("<HB [ACK]>"));
 			Serial.write('\n');
-      Serial.write("<HB [RSP]>");
+      Serial.print(F("<HB [RSP]>"));
       Serial.write('\n');
 			break;
 		}	
 		case GOTOACK:
 		{
-			Serial.write("<btgoto [ACK]>");
+			Serial.print(F("<btgoto [ACK]>"));
 			Serial.write('\n');
 			break;
 		}
@@ -23,7 +23,7 @@ int serialResponder(int responce)
    
 		case GOTOSWERR:
 		{
-			Serial.write("<btgoto [ERR]>");//Error condtion from btgoto
+			Serial.print(F("<btgoto [ERR]>"));//Error condtion from btgoto
 			Serial.write('\n');
 			break;
 		}
@@ -31,55 +31,73 @@ int serialResponder(int responce)
 		{
 			if(inmove == false)
 			{
-			  Serial.write("<btredy [ACK]>");//Device ready after setup
+			  Serial.print(F("<btredy [ACK]>"));//Device ready after setup
 			  Serial.write('\n');
 			}
      else
      {
-        Serial.write("<btredy [BSY]>");//Device not after setup
+        Serial.print(F("<btredy [BSY]>"));//Device not after setup
         Serial.write('\n');
      }
-        Serial.write("<btredy [RSP]>");
+        Serial.print(F("<btredy [RSP]>"));
         Serial.write('\n');         
 			break;
 		}
 		case READYSWERR:
 		{
-			Serial.write("<btredy [ERR]>");//btready error,  startup sequence not complete properly
+			Serial.print(F("<btredy [ERR]>"));//btready error,  startup sequence not complete properly
 			Serial.write('\n');
 			break;
 		}
 		case SEQUENCEACK:
 		{
-			Serial.write("<btsequence [ACK]>");//Acknoledge sequence recived
+			Serial.print(F("<btsequence [ACK]>"));//Acknoledge sequence recived
 			Serial.write('\n');
       break;
 		}
 
     case SEQTHERE:
     {
-      Serial.write("<btsequence [ACK]>");//Acknoledge sequence recived
+      Serial.print(F("<btsequence [ACK]>"));//Acknoledge sequence recived
       Serial.write('\n');
-      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.print(F("<btmovecomplete [RSP]>"));//Acknoledge sequence recived
       Serial.write('\n');
       break;
     }
     case LOADTHERE:
     {
-      Serial.write("<btload [ACK]>");//Acknoledge sequence recived
+      Serial.print(F("<btload [ACK]>"));//Acknoledge sequence recived
       Serial.write('\n');
-      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.print(F("<btmovecomplete [RSP]>"));//Acknoledge sequence recived
       Serial.write('\n');
       break;
     }    
     case CENTRETHERE:
     {
-      Serial.write("<btcentre [ACK]>");//Acknoledge sequence recived
+      Serial.print(F("<btcentre [ACK]>")) ;//Acknoledge sequence recived
       Serial.write('\n');
       Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
       Serial.write('\n');
       break;
     }
+    case GOPOSTHERE:
+    {
+      Serial.print(F("<btgopos [ACK]>")) ;//Acknoledge sequence recived
+      Serial.write('\n');
+      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      break;
+    }
+    case STARTTHERE:
+    {
+      Serial.print(F("<btgostrpos [ACK]>")) ;//Acknoledge sequence recived
+      Serial.write('\n');
+      Serial.write("<btmovecomplete [RSP]>");//Acknoledge sequence recived
+      Serial.write('\n');
+      break;
+    }
+    
+    
     case NEXTACK:
     {
       Serial.write("<btnext [ACK]>");//next in sequence recived
@@ -89,13 +107,19 @@ int serialResponder(int responce)
     
     case PREVACK:
     {
-      Serial.write("<btprev [ACK}>");//previous in sequence recived
+      Serial.write("<btprev [ACK]>");//previous in sequence recived
       Serial.write('\n');
       break;
     }
      case GOPOSACK:
     {
-      Serial.write("<gopos [ACK]>");//previous in sequence recived
+      Serial.print("<btgopos [ACK]>");//previous in sequence recived
+      Serial.write('\n');
+      break;
+    }
+    case STRPOSACK:
+    {
+      Serial.write("<btgostrpos [ACK]>");//previous in sequence recived
       Serial.write('\n');
       break;
     }
@@ -190,6 +214,14 @@ int serialResponder(int responce)
       Serial.write('\n');
       break;
     }
+    case STRPOSBSY://Stepper motors busy cannot move yet
+    {
+      Serial.write("<btgostrpos [ACK]>");
+      Serial.write('\n');
+      Serial.write("<btgostrpos [BSY]>");
+      Serial.write('\n');
+      break;
+    }
     case NEXTBSY://Stepper motors busy cannot move yet
     {
       Serial.write("<btnext [ACK]>");
@@ -234,7 +266,7 @@ int serialResponder(int responce)
     {
       Serial.write("<btseqnum [ACK]>");
       Serial.write('\n');
-      Serial.write("<027 [RSP]>");  //Change if required ####
+      Serial.write("<btseqnum 027 [RSP]>");  //Change if required ####
       Serial.write('\n');   
       break;
     }
@@ -246,7 +278,7 @@ int serialResponder(int responce)
 		}
 		case COMMANDERROR://Error in command
 		{
-			Serial.write("<btcomd [ERR}>");
+			Serial.write("<btcomd [ERR]>");
 			Serial.write('\n');
 			break;
 		}
@@ -270,24 +302,29 @@ int serialResponder(int responce)
       Serial.write('\n');   
 ;
       Serial.write("<btpos ");
-      if(newPosition <10)//Shows <001/039> where 001 is the point in the sequence completed and 039 being the total number of sequences ie 0-39 (40 steps)
-        Serial.write("00");
-      else
-         Serial.write("0");
-      Serial.print(newPosition);
+       if (newPosition == 100)//Load position
+        Serial.write("Load");
+      else if (newPosition == 200)//Centre position
+        Serial.write("Centre");
+      else if(newPosition <10)//Shows <001/039> where 001 is the point in the sequence completed and 039 being the total number of sequences ie 0-39 (40 steps)
+        {
+          Serial.write("00");
+          Serial.print(newPosition);
+        }
+
+      else if ((newPosition <100) && (newPosition >=10))
+      {
+        Serial.write("0");
+        Serial.print(newPosition);
+      }
       Serial.write(" [RSP]>");
-//      if(returnedData.numberpos <10)
-//        Serial.write("00");
-//      else
-//        Serial.write("0");
-//      Serial.print(returnedData.numberpos);
-      Serial.write(">");
       Serial.write('\n');
+
       break;
    }
-		
-		default :
-		{
+    
+    default :
+    {
 			Serial.write("<?>");// Esentually unknown command
 			Serial.write('\n');
 			break;

@@ -4,23 +4,24 @@ serialReturn interpretCommand(String inputString)
 {
 	serialReturn returnData;//Struct to return command respone including movement
 	int linearMove, angularMove, vibPWM;
-	char inputChar[4];	
+	char inputChar[4];
   if(inputString == "{HB}")//  Heatbeat
 	
 	{
 		returnData.move = false;
 		returnData.responce = HB;
 		returnData.vib = 0;
-		returnData.lin = 0;
-		returnData.ang = 0;
+		returnData.lin = returnedData.lin;
+		returnData.ang = returnedData.ang;
 	}
 	else if(inputString =="help" || inputString =="Help")
 	{
 		returnData.move = false;
 		returnData.responce = HELP;
 		returnData.vib = 0;
-		returnData.lin = 0;
-		returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
+
 	}
 
 	else if(inputString == "{btsequence}")
@@ -32,20 +33,19 @@ serialReturn interpretCommand(String inputString)
 		  returnData.move = true;
 		  returnData.responce = SEQUENCEACK;
 		  returnData.vib = 0;
-		  returnData.lin = 0;
-		  returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 		  returnData.posnumber = 0;
 		  returnData.numberpos = SAMPLEARRAY; // (sizeof(sampleArray) / sizeof(sampleArray[0]));
       goFlag = false;
 	  }
    else
     {
-//    Serial.println("in there");
       returnData.move = false;
       returnData.responce = SEQTHERE;
       returnData.vib = 0;
-      returnData.lin = 0;
-      returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
       returnData.posnumber = 0;
       returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
     }
@@ -58,18 +58,41 @@ serialReturn interpretCommand(String inputString)
     returnData.move = true;
     returnData.responce = NEXTACK;
     returnData.vib = 0;
-//    returnData.lin = 0;
-//    returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
     goFlag = true;
-  } 
+  }
+   else if(inputString =="{btgostrpos}")
+  {
+  if(newPosition != 0)  
+  {
+    returnData.move = true;
+    returnData.responce = STRPOSACK;
+    returnData.vib = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
+    goFlag = true;
+  }
+  else
+  {
+    returnData.move = false;
+    returnData.responce = STARTTHERE;
+    Serial.println("Im here darling ");
+    returnData.vib = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
+    returnData.posnumber = 0;
+    returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
+   } 
+  }
 
   else if(inputString =="{btprev}")
   {
     returnData.move = true;
     returnData.responce = PREVACK;
     returnData.vib = 0;
-//    returnData.lin = 0;
-//    returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
     goFlag = true;
   }
 	else if(inputString =="{btcentre}")
@@ -125,8 +148,8 @@ serialReturn interpretCommand(String inputString)
 				returnData.move = false;
 				returnData.responce = GOTOSWERR;
 				returnData.vib = 0;
-				returnData.lin = 0;
-				returnData.ang = 0;
+				returnData.lin = returnedData.lin;
+        returnData.ang = returnedData.ang;
 			}
 		}
 		else
@@ -134,44 +157,51 @@ serialReturn interpretCommand(String inputString)
 			returnData.move = false;
 			returnData.responce = GOTOSWERR;
 			returnData.vib = 0;
-			returnData.lin = 0;
-			returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 			returnData.posnumber = NOPROGRAM;
 		}
 
 	}
   else if(inputString.substring(0,9) == "{btgopos ")
 	{
-   
 		if(inputString.endsWith("}"))
 		{
-			sampleStep = (inputString.substring(9,12).toInt());   
+
+         
+			sampleStep = (inputString.substring(9,12).toInt());
+   
 			stringComplete = true;
-			if ((sampleStep >= 0) && (sampleStep  <= SAMPLEARRAY))
-			{
-				returnData.move = true;
+			if ((sampleStep >= 0) && (sampleStep  <= SAMPLEARRAY) && (sampleStep !=newPosition))
+			{				
+			  returnData.move = true;
+        newPosition = sampleStep;
 				returnData.responce = GOPOSACK;
 				returnData.posnumber = sampleStep;
 				returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
+        returnData.lin = returnedData.lin;
+        returnData.ang = returnedData.ang;
         goFlag = true;
 				
 			}
-			else
-			{
-				returnData.move = false;
-				returnData.responce = GOTOSWERR;
-				returnData.vib = 0;
-				returnData.lin = 0;
-				returnData.ang = 0;
-			}
+     else if (sampleStep == newPosition)
+    {
+      returnData.move = false;
+      returnData.responce = GOPOSTHERE;
+      returnData.vib = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
+      returnData.posnumber = newPosition;
+      returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
+    }
 		}
 		else
 		{
 			returnData.move = false;
 			returnData.responce = GOTOSWERR;
 			returnData.vib = 0;
-			returnData.lin = 0;
-			returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 		}
 	}
 	
@@ -189,8 +219,8 @@ serialReturn interpretCommand(String inputString)
 				returnData.move = false;
 				returnData.responce = VIBACK;
 				returnData.vib = vibPWM;
-				returnData.lin = 0;
-				returnData.ang = 0;
+			  returnData.lin = returnedData.lin;
+        returnData.ang = returnedData.ang;
 			}
 			else
 			{
@@ -198,8 +228,8 @@ serialReturn interpretCommand(String inputString)
 				returnData.move = false;
 				returnData.responce = VIBERR;
 				returnData.vib = 0;
-				returnData.lin = 0;
-				returnData.ang = 0;				
+				returnData.lin = returnedData.lin;
+        returnData.ang = returnedData.ang;	
 			}
 		}
 		else
@@ -207,8 +237,8 @@ serialReturn interpretCommand(String inputString)
 			returnData.move = false;
 			returnData.responce = GOTOSWERR;
 			returnData.vib = 0;
-			returnData.lin = 0;
-			returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 		}
 
 	}
@@ -219,18 +249,15 @@ serialReturn interpretCommand(String inputString)
 		returnData.move = false;
 		returnData.responce = READYACK;
 		returnData.vib = 0;
-//		returnData.lin = 0;
-//		returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
 	}
  else if(inputString == "{btload}")//HOME
 	
 	{
-//    Serial.println(returnData.lin);
-//    Serial.println(returnData.ang);
-//    Serial.println((returnData.lin != 0) && (returnedData.ang != 0));
   if ((returnedData.lin != 0))// && (returnedData.ang != 0))
     {
-//      Serial.print("Can I get in here");
+
       returnData.move = true;
       returnData.responce = LOADACK;
       returnData.vib = 0;
@@ -258,14 +285,17 @@ else if(inputString  == "{btextd}")//Extend
 		returnData.move = false;
 		returnData.responce = EXTENDACK;
 		returnData.vib = 0;
-//		returnData.lin = 0;
-//		returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
 	}
 	
 else if(inputString  == "{btpos}")//Extend
   {
     returnData.move = false;
     returnData.responce = POSACK;
+    returnedData.vib = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
 
   }
  else if(inputString == "{btinfo}")//INFO
@@ -274,8 +304,8 @@ else if(inputString  == "{btpos}")//Extend
 		returnData.responce = INFO;
 		//		Serial.println("Got to BTINFO");
 		returnData.vib = 0;
-//		returnData.lin = 0;
-//		returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
 	}
 
  else if(inputString == "{btseqnum}")//Sequence number
@@ -284,8 +314,8 @@ else if(inputString  == "{btpos}")//Extend
     returnData.responce = SEQNUM;
     //    Serial.println("Got to BTINFO");
     returnData.vib = 0;
-//    returnData.lin = 0;
-//    returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
   }
 else if(inputString.substring(0,8) == "{btwtsn ")//Serial number write
 	
@@ -301,16 +331,16 @@ else if(inputString.substring(0,8) == "{btwtsn ")//Serial number write
 			returnData.move = false;
 			returnData.responce = SNACK;
 			returnData.vib = 0;
-			returnData.lin = 0;
-			returnData.ang = 0;
+      returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 		}
 		else
 		{
 			returnData.move = false;
 			returnData.responce = NORESPONCE_CLEAR;
 			returnData.vib = 0;
-			returnData.lin = 0;
-			returnData.ang = 0;
+			returnData.lin = returnedData.lin;
+      returnData.ang = returnedData.ang;
 		}
 	}
 
@@ -328,6 +358,9 @@ else if(inputString.substring(0,8) == "{btwtsn ")//Serial number write
 					defresponce = COMMANDERROR;
 				}
         returnData.responce = defresponce;
+        returnData.lin = returnedData.lin;
+        returnData.ang = returnedData.ang;
+        returnedData.vib = 0;
 			}
 		}
     else
@@ -337,8 +370,8 @@ else if(inputString.substring(0,8) == "{btwtsn ")//Serial number write
 		returnData.responce = defresponce;
 		returnData.move = false;
 		returnData.vib = 0;
-		returnData.lin = 0;
-		returnData.ang = 0;
+    returnData.lin = returnedData.lin;
+    returnData.ang = returnedData.ang;
 			
 		}
    	

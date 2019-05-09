@@ -68,9 +68,13 @@
   #define SEQNUMACK 35
   #define SEQTHERE 36
   #define LOADBSY 37
-  #define SAMPLEARRAY 27
+  #define SAMPLEARRAY 26
   #define LOADTHERE 38
   #define CENTRETHERE 39
+  #define STRPOSACK 40
+  #define STRPOSBSY 41
+  #define GOPOSTHERE 42
+  #define STARTTHERE 43
   
 	bool dir = true;
   bool goFlag = false;//To distingush from sequence and btgoto...
@@ -100,11 +104,12 @@
 //		{34,0},{34,180}};
 
 // 27 position sample
-  const int sampleArray[27][2] = {{32,0},{32,120},{32,240},{20,240},{20,280},
-    {20,320},{20,0},{20,40},{20,80},{20,120},{20,160},{20,200},
-    {10,216},{10,240},{10,264},{10,288},{10,312},{10,336},{10,0},
-    {10,24},{10,48},{10,72},{10,96},{10,120},{10,144},
-    {10,168},{10,192}};
+  const int sampleArray[27][2] = {
+    {10,0},{10,24},{10,48},{10,72},{10,96},{10,120},{10,144},
+    {10,168},{10,192},{10,216},{10,240},{10,264},{10,288},
+    {10,312},{10,336},{20,336},{20,16},
+    {20,56},{20,96},{20,136},{20,176},{20,216},{20,256},{20,296},
+    {32,296},{32,56},{32,176}};
       
 	int sampleStep = 0;
 	

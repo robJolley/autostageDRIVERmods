@@ -18,7 +18,7 @@ boolean stringComplete = false;  // whether the string is complete
 
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(115200);// Change to 115200??
 	Serial.setTimeout(50);// Set the minimum timeout to 50ms to slow hangups,,  may be ideal to decrease this further.....
 	pinMode(MTR_DRV, OUTPUT);  
 	DDRC = DDRC & B11110011;// Mask to set pin A2 and A3 to input,  ignoring others used.
@@ -42,7 +42,7 @@ void setup()
 	angularPosition = 0;
   returnedData.posnumber = 0;
   returnedData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
-  newPosition = 0;
+  newPosition = 100;
 }
 
 void loop()
@@ -60,7 +60,6 @@ void loop()
 	{
 		responceToSend = MOVECOMPLETE;
     returnedData.posnumber = newPosition;//Previous move complete.  Waits for either next or prev
-
 		indicatorLight(GREEN);
 	}
 	
@@ -85,14 +84,22 @@ void loop()
 
    
     else if((returnedData.move == true) && (returnedData.responce == NEXTACK) && (inmove == false))//Valid command to move
-    {
-      if(newPosition >= returnedData.numberpos ||newPosition < 0 )
+    { 
+      if((newPosition == 100) || (newPosition == 200))
+        {
+          newPosition = 0;
+          TMC2130_LS.moveAbsolute(findPosLS());
+          TMC2130_TT.moveAbsolute(findPosTT());
+        
+          responceToSend = NEXTACK;
+          }
+      else if(newPosition >= returnedData.numberpos ||newPosition < 0 )
         responceToSend = COMMANDERROR;
       else
         {
+          newPosition++;   
           TMC2130_LS.moveAbsolute(findPosLS());
-          TMC2130_TT.moveAbsolute(findPosTT());
-          newPosition++;         
+          TMC2130_TT.moveAbsolute(findPosTT());         
           responceToSend = NEXTACK;
         }
       
@@ -110,27 +117,38 @@ void loop()
         }
       
     }
+    else if((returnedData.move == true) && (returnedData.responce == STRPOSACK) && (inmove == false))//Valid command to move
+    {
+
+          newPosition = 0;
+          TMC2130_LS.moveAbsolute(findPosLS());
+          TMC2130_TT.moveAbsolute(findPosTT());          
+          responceToSend = STRPOSACK;
+      
+    }
     
     else if((returnedData.move == true) && (returnedData.responce == PREVACK) && (inmove == false))//Valid command to move
-    {
-      if(newPosition < 1)
+    { 
+
+      if((newPosition < 1) || (newPosition == 100) || (newPosition == 200))
         responceToSend = COMMANDERROR;
       else
         {
-        newPosition--;
         newPosition--;  
         TMC2130_LS.moveAbsolute(findPosLS());
         TMC2130_TT.moveAbsolute(findPosTT());
-        newPosition++;
         responceToSend = PREVACK;
         }
     
     }
    
-		else if ((returnedData.move == true) && (returnedData.responce == GOTOACK || returnedData.responce == GOPOSACK|| returnedData.responce == CENTREACK|| returnedData.responce == LOADACK || returnedData.responce == SEQUENCEACK || returnedData.responce == NEXTACK || returnedData.responce == PREVACK) && (inmove == true))//Cannot move as aleady moving
+		else if ((returnedData.move == true) && (returnedData.responce == STRPOSACK ||returnedData.responce == GOTOACK || returnedData.responce == GOPOSACK|| returnedData.responce == CENTREACK|| returnedData.responce == LOADACK || returnedData.responce == SEQUENCEACK || returnedData.responce == NEXTACK || returnedData.responce == PREVACK) && (inmove == true))//Cannot move as aleady moving
 		{
 			if (returnedData.responce == GOTOACK)
 			  responceToSend = GOTOBSY;
+       if (returnedData.responce == STRPOSACK)
+        responceToSend = STRPOSBSY;
+       
       else if (returnedData.responce == SEQUENCEACK)
         responceToSend = SEQBSY;
       else if (returnedData.responce == NEXTACK)
@@ -161,7 +179,7 @@ void loop()
 		{
 			TMC2130_LS.load();//Sets position to move to home to
 			TMC2130_TT.load();
-      newPosition = 0;
+      newPosition = 100;
 //      Serial.println("Got in here load");
 			responceToSend = LOADACK;
 		}
@@ -173,11 +191,20 @@ void loop()
     {
       responceToSend = CENTRETHERE;
     }
+    else if(returnedData.responce == STARTTHERE)
+    {
+      responceToSend = STARTTHERE;
+    }
+    else if(returnedData.responce == GOPOSTHERE)
+    {
+      responceToSend = GOPOSTHERE;
+    }
     else if((returnedData.responce == CENTREACK))
     {
       TMC2130_LS.centre();//Sets position to move to home to
       TMC2130_TT.centre();
       responceToSend = CENTREACK;
+      newPosition = 200;
     }
     else if((returnedData.responce == POSACK))
     {
@@ -254,6 +281,7 @@ void serialEvent() {
 		if ((inChar == '}') or (inputString =="help") or (inputString == "Help")) 
 		{
 			stringComplete = true;
+      Serial.flush();// In order to fluxh out serial port in the event 
 		}
 		else
 		{
