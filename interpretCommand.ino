@@ -104,6 +104,7 @@ serialReturn interpretCommand(String inputString)
       returnData.responce = CENTREACK;
       returnData.vib = 0;
       returnData.lin = 50;
+      returnedData.ang = 0;//Settting the angle to 0 as we not longer care about the previous angular position
       returnData.ang = 0;
       returnData.posnumber = 0;
       returnData.numberpos = SAMPLEARRAY; // (sizeof(sampleArray) / sizeof(sampleArray[0]));
@@ -115,6 +116,7 @@ serialReturn interpretCommand(String inputString)
       returnData.responce = CENTRETHERE;
       returnData.vib = 0;
       returnData.lin = 50;
+      returnedData.ang = 0;
       returnData.ang = 0;
       returnData.posnumber = 0;
       returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
@@ -262,6 +264,7 @@ serialReturn interpretCommand(String inputString)
       returnData.responce = LOADACK;
       returnData.vib = 0;
       returnData.lin = 0;
+      returnedData.ang = 0;
       returnData.ang = 0;
       returnData.posnumber = 0;
       returnData.numberpos = SAMPLEARRAY; // (sizeof(sampleArray) / sizeof(sampleArray[0]));
@@ -274,6 +277,7 @@ serialReturn interpretCommand(String inputString)
       returnData.responce = LOADTHERE;
       returnData.vib = 0;
       returnData.lin = 0;
+      returnedData.ang = 0;
       returnData.ang = 0;
       returnData.posnumber = 0;
       returnData.numberpos = SAMPLEARRAY;//(sizeof(sampleArray) / sizeof(sampleArray[0]));
