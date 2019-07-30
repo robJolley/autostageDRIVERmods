@@ -102,6 +102,7 @@ serialReturn interpretCommand(String inputString)
     {
       returnData.move = true;
       returnData.responce = CENTREACK;
+      TMC2130_TT.currentPos = 0.0;
       returnData.vib = 0;
       returnData.lin = 50;
       returnedData.ang = 0;//Settting the angle to 0 as we not longer care about the previous angular position
@@ -262,6 +263,7 @@ serialReturn interpretCommand(String inputString)
 
       returnData.move = true;
       returnData.responce = LOADACK;
+      TMC2130_TT.currentPos = 0.0;
       returnData.vib = 0;
       returnData.lin = 0;
       returnedData.ang = 0;

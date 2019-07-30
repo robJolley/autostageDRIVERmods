@@ -49,7 +49,7 @@ int angularTMC2130Stepper::initilise(int microSteps,int SilinentStepStick,int St
 	motionTMC2130Stepper::initilise(microSteps,SilinentStepStick,Stealthchop, setacceleration, setspeed);
 	copyMicroSteps = microSteps;
 	TMC2130Stepper::rms_current(600);
-	AccelStepper::setMaxSpeed(3000.0);
+	AccelStepper::setMaxSpeed(6000.0);
 	AccelStepper::setAcceleration(1000.0);
 	pinMode(index_pin,INPUT); 
 }
@@ -58,9 +58,9 @@ int angularTMC2130Stepper::initilise()
     motionTMC2130Stepper::initilise();
 	motionTMC2130Stepper::microsteps(256);
 	copyMicroSteps = 256;
-	TMC2130Stepper::rms_current(600);
-	AccelStepper::setMaxSpeed(3000.0);
-	AccelStepper::setAcceleration(1000.0);
+	TMC2130Stepper::rms_current(600);//
+	AccelStepper::setMaxSpeed(24000.0);
+	AccelStepper::setAcceleration(6000.0);//was 1000
     pinMode(index_pin,INPUT); 
 }
 
@@ -96,7 +96,7 @@ byte angularTMC2130Stepper::load()
 }
 byte angularTMC2130Stepper::centre()
 {
-  moveAbsolute(0);
+//  moveAbsolute(0);
   return 0;
 }
 
@@ -130,7 +130,7 @@ int linearTMC2130Stepper::initilise()
 	TMC2130Stepper::microsteps(64);
 	copyMicroSteps = 64;
 	moveCount = 0.0;
-	TMC2130Stepper::rms_current(800);
+	TMC2130Stepper::rms_current(1200);
     pinMode(limit1_pin,INPUT);
     pinMode(limit2_pin,INPUT); 
 }

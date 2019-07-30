@@ -55,12 +55,16 @@ void loop()
 	if ((inmove == true) && (inmoveOld == false))//Each return 1 if moving, also will move single step/microstep if steps available to take to desired position
 	{
 		indicatorLight(ORANGE);
+    TMC2130_LS.rms_current(1400);
+    TMC2130_TT.rms_current(600);    
 	}
 	if((inmove == false) && (inmoveOld == true))
 	{
 		responceToSend = MOVECOMPLETE;
     returnedData.posnumber = newPosition;//Previous move complete.  Waits for either next or prev
 		indicatorLight(GREEN);
+    TMC2130_LS.rms_current(400);
+    TMC2130_TT.rms_current(200);
 	}
 	
 	if (stringComplete) 
@@ -299,12 +303,12 @@ void serialEvent() {
 
 byte indicatorLight(byte colour)
 {
-	if(colour == GREEN)
+	if(colour == GREEN)//Colours reversed  change back to GREEN
 	{
 		digitalWrite(GREEN_LED, HIGH);
 		digitalWrite(RED_LED, LOW);
 	}
-	else if(colour == RED)
+	else if(colour == RED)//Colours Reversed change back to RED
 	{
 		digitalWrite(GREEN_LED, HIGH);
 		digitalWrite(RED_LED, LOW);
